@@ -1,5 +1,3 @@
-exception NotImplemented;;
-
 (* The type of parsed expression trees *)
 type exptree =
   | Var of char
@@ -16,7 +14,7 @@ let charSet =
 let isin (x: char) lst =
   List.exists (fun y -> x = y) lst
 
-(* Question 1: Parsing *)
+(* Parsing *)
 let parse (inputexp: string): exptree =
   let sym = ref inputexp.[0] in
   let cursor = ref 0 in
@@ -81,7 +79,7 @@ let parse (inputexp: string): exptree =
   in
   expr ()
 
-(* Question 2: Code Generation *)
+(* Code Generation *)
 let tempstore = ref 0
 
 let codegen (e: exptree) =
@@ -92,7 +90,7 @@ let codegen (e: exptree) =
                 else if tag = '*' then Printf.printf "MUL  %c\n" c
                 else if tag = '-' then Printf.printf "SUB  %c\n" c
                 else if tag = '/' then Printf.printf "DIV  %c\n" c)
-              
+
     | Expr(op, l, r) ->
         if (tag = '=') then
           (helper (l,'=');
@@ -106,12 +104,18 @@ let codegen (e: exptree) =
             helper (r,op);
             (if (tag = '+') then
                Printf.printf "ADD %i\n" !tempstore
+             else if (tag = '-') then
+               Printf.printf "SUB %i\n" !tempstore
+             else if (tag = '/') then
+               Printf.printf "DIV %i\n" !tempstore
              else
                Printf.printf "MUL %i\n" !tempstore);
             tempstore := !tempstore - 1;
           end
   in
   helper (e, '=')
+
+  (* Executing functions from user input *)
 let () = print_string "Enter a simple algebraic expression (no spaces):";;
 let x = read_line () ;;
 let () = print_string "The machine code to perform this expression is:\n";;
